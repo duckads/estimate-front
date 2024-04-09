@@ -13,3 +13,8 @@ nvm use 18
 yarn add react-router-dom
 yarn add react-cookie
 yarn add antd
+yarn add @ant-design/icons
+yarn add react-router
+yarn add recharts
+yarn add @iconify/react
+yarn add react-sticky-box
