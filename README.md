@@ -18,3 +18,7 @@ yarn add react-router
 yarn add recharts
 yarn add @iconify/react
 yarn add react-sticky-box
+yarn add @fortawesome/react-fontawesome  
+yarn add @fortawesome/free-solid-svg-icons
+
+
