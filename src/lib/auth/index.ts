@@ -38,18 +38,19 @@ export const {
       async authorize(credentials): Promise<User | null> {
         if (!credentials || !credentials.email || !credentials.password) return null;
 
-        let loginRes = await login(credentials);
-        loginRes = {
-          success: true,
-          user: loginRes
-        };
-        // let loginRes = {
+        // let loginRes = await login(credentials);
+        // console.log(loginRes)
+        // loginRes = {
         //   success: true,
-        //   data: {
-        //     name: '홍길동',
-        //     accessToken: '1234'
-        //   }
+        //   user: loginRes
         // };
+        let loginRes = {
+          success: true,
+          user: {
+            name: '홍길동',
+            accessToken: '1234'
+          }
+        };
 
         if (!loginRes.success) return null;
         const user = {

@@ -1,72 +1,42 @@
-'use client';
+import LoginForm from '@/components/form/LoginForm';
+import { Card, Col, Layout, Row } from 'antd';
+import { Content } from 'antd/es/layout/layout';
 
-import { authenticate } from '@/lib/auth/actions';
-import { Button, Checkbox, Form, Input } from 'antd';
-import { useState } from 'react';
 
-type FieldType = {
-  email?: string;
-  password?: string;
-  remember?: boolean;
-};
 
-export default function RootPage() {
-  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
-
-  const onFinish = async (values: FormData) => {
-    try {
-      await authenticate(values);
-    } catch (error) {
-      setErrorMsg('Authentication failed');
-    }
-  };
-
+export default function LoginPage() {
   return (
-    <div>
-      <h1>로그인</h1>
-      <Form
-        name='basic'
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600 }}
-        initialValues={{ remember: true }}
-        autoComplete='off'
-        onFinish={ onFinish }
-      >
-        <Form.Item<FieldType>
-          label='Email'
-          name='email'
-          rules={[
-            { required: true, message: 'Please input your email!',  },
-            // { type: 'email', message: 'Please enter a valid email format!' }
-          ]}
+    <Layout >
+      <Content style={{ height: '100vh' }}>
+        <Row
+          justify="center"
+          align="middle"
+          style={{ height: '100%' }}
         >
-          <Input placeholder='example@example.com' />
-        </Form.Item>
+          <Col xs={ 24 } md={ 16 } xl={ 12 }>
+            <Row
+              justify="center"
+              align="middle"
+            >
+              <Card style={{ margin: '20px', minHeight: '400px', height: '100%', maxWidth: '700px', minWidth: '500px' }}>
+                <Row
+                  justify="center"
+                  align="middle"
+                  style={{ margin: '20px' }}
+                >
+                  <h1>LOGIN</h1>
+                </Row>
+                <LoginForm />
+              </Card>
+            </Row>
+          </Col>
+          <Col xs={ 24 } md={ 16 } xl={ 12 }>
+            <Card style={{ margin: '20px', minHeight: '400px' }}>
 
-        <Form.Item<FieldType>
-          label='Password'
-          name='password'
-          rules={[{ required: true, message: 'Please input your password!' }]}
-        >
-          <Input.Password placeholder='password' />
-        </Form.Item>
-
-        <Form.Item<FieldType>
-          name='remember'
-          valuePropName='checked'
-          wrapperCol={{ offset: 8, span: 16 }}
-        >
-          <Checkbox>Remember me</Checkbox>
-        </Form.Item>
-
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type='primary' htmlType='submit'>
-            Submit
-          </Button>
-        </Form.Item>
-        {errorMsg && <p>{errorMsg}</p>}
-      </Form>
-    </div>
+            </Card>
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
   );
 }

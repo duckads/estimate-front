@@ -1,4 +1,8 @@
+import LayoutFooter from '@/components/layout/Footer';
+import LayoutSider from '@/components/layout/SIder';
 import { auth } from '@/lib/auth';
+import { Layout } from 'antd';
+import { Content, Header } from 'antd/es/layout/layout';
 import { SessionProvider } from 'next-auth/react';
 
 export default async function ServiceLayout({
@@ -10,7 +14,16 @@ export default async function ServiceLayout({
 
   return (
     <SessionProvider session={ session }>
-      { children }
+      <Layout style={{ minHeight: '100vh' }}>
+        <LayoutSider />
+        <Layout>
+          <Header></Header>
+          <Content style={{ margin: '0 16px' }}>
+            { children }
+          </Content>
+          <LayoutFooter />
+        </Layout>
+      </Layout>
     </SessionProvider>
   );
 }

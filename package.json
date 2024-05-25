@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbo --experimental-https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.7",
     "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.17.2",
     "axios": "^1.6.8",
