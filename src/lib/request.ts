@@ -1,7 +1,7 @@
 import { getSession } from 'next-auth/react';
 import { METHOD } from './apis';
 
-const BASE_URL = 'http://askabriel.iptime.org:8080';
+const BASE_URL = 'http://localhost:8080';
 
 /**
  * URL에서 데이터를 가져와서 JSON 형식으로 반환하는 함수

@@ -11,8 +11,10 @@ import { authConfig } from './auth.config';
  * 로그인 요청을 보내고 accessToken의 정보를 반환하는 함수
  * 
  * @param { any } credentials - 로그인 데이터 json 형식
- * @returns { Promise<any> } - 요청이 성공하면 JSON 데이터가 포함된 Promise를 반환
+ * @returns { Promise<anCredentialsy> } - 요청이 성공하면 JSON 데이터가 포함된 Promise를 반환
  */
+
+// fetch
 async function login(credentials: any): Promise<any> {
   const res = await fetchDataWithHeader(API_URL.AUTH.SIGNIN, {
     method: METHOD.POST,
@@ -38,19 +40,19 @@ export const {
       async authorize(credentials): Promise<User | null> {
         if (!credentials || !credentials.email || !credentials.password) return null;
 
-        // let loginRes = await login(credentials);
-        // console.log(loginRes)
-        // loginRes = {
-        //   success: true,
-        //   user: loginRes
-        // };
-        let loginRes = {
+        let loginRes = await login(credentials);
+        console.log(loginRes)
+        loginRes = {
           success: true,
-          user: {
-            name: '홍길동',
-            accessToken: '1234'
-          }
+          user: loginRes
         };
+        // let loginRes = {
+        //   success: true,
+        //   user: {
+        //     name: '홍길동',
+        //     accessToken: '1234'
+        //   }
+        // };
 
         if (!loginRes.success) return null;
         const user = {
