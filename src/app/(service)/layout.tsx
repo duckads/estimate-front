@@ -1,5 +1,6 @@
 import LayoutFooter from '@/components/layout/Footer';
-import LayoutSider from '@/components/layout/SIder';
+import LayoutSider from '@/components/layout/Sider';
+import LayoutHeader from '@/components/layout/Header';
 import { auth } from '@/lib/auth';
 import { Layout } from 'antd';
 import { Content, Header } from 'antd/es/layout/layout';
@@ -17,7 +18,7 @@ export default async function ServiceLayout({
       <Layout style={{ minHeight: '100vh' }}>
         <LayoutSider />
         <Layout>
-          <Header></Header>
+          <LayoutHeader></LayoutHeader>
           <Content style={{ margin: '0 16px' }}>
             { children }
           </Content>
