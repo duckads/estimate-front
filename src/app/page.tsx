@@ -2,8 +2,6 @@ import LoginForm from '@/components/form/LoginForm';
 import { Card, Col, Layout, Row } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 
-
-
 export default function LoginPage() {
   return (
     <Layout >
@@ -32,7 +30,6 @@ export default function LoginPage() {
           </Col>
           <Col xs={ 24 } md={ 16 } xl={ 12 }>
             <Card style={{ margin: '20px', minHeight: '400px' }}>
-
             </Card>
           </Col>
         </Row>
