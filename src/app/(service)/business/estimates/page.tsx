@@ -1,11 +1,12 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
-import { Layout, DatePicker, Table, Typography, Input, Row, Col, Dropdown, Button, Menu } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Layout, DatePicker, Table, Typography, Input, Row, Col, Dropdown, Button, Menu, Space } from 'antd';
 import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs'; // Ensure dayjs is correctly imported
 import 'dayjs/locale/ko';
 import { fetchDataWithToken } from '@/lib/request';
-import {METHOD} from "@/lib/apis";
+import { METHOD } from "@/lib/apis";
 
 const { Header, Content } = Layout;
 const { RangePicker } = DatePicker;
@@ -45,53 +46,59 @@ const columns = [
 ];
 
 const Page: React.FC = () => {
+    const getDefaultDates = () => {
+        const end = dayjs();
+        const start = end.subtract(3, 'month');
+        return { startDateState: start, endDateState: end };
+    };
+
+    const { startDateState, endDateState } = getDefaultDates();
+    const [startDate, setStartDate] = useState(startDateState.format('YYYY-MM-DD'));
+    const [endDate, setEndDate] = useState(endDateState.format('YYYY-MM-DD'));
 
     const [tableData, setTableData] = useState([]);
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
 
-    const [startDate, setStartDate] = useState('2020-01-01');
-    const [endDate, setEndDate] = useState('2026-01-17');
     const [pageIdx, setPageIdx] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-
     const [searchSeq, setSearchSeq] = useState<string>('');
 
-    useEffect(() => {
-        // Fetch data when component mounts
-        const fetchDataOnMount = async () => {
-            try {
+    const fetchData = async (pageNumber: number, pageSize: number) => {
+        try {
+            const bodyJson = {
+                where: [{ field: 'reg_dt', operation: 'between', value: [startDate, endDate] }],
+                pageIdx: pageNumber,
+                pageSize: pageSize
+            };
 
-                const bodyJson = {
-                    where: [{ field: 'reg_dt', operation: 'between', value: [startDate, endDate] }],
-                    pageIdx: pageIdx,
-                    pageSize: pageSize
+            const fetchedData = await fetchDataWithToken('/estimates', {}, METHOD.POST, bodyJson);
+
+            const tempTableData = fetchedData.content.map(item => {
+                return {
+                    seq: item.seq,
+                    customerCom: item.customer_com.name,
+                    customerMgr: item.customer_mgr.name,
+                    estimateMgr: item.estimate_mgr.name,
+                    updDt: item.upd_dt.substring(0, 10),
+                    type: item.estimate_tp === '104002' ? '공사' : '납품'
                 };
+            });
 
-                const fetchedData = await fetchDataWithToken('/estimates', {}, METHOD.POST,  bodyJson); // Adjust endpoint and method accordingly
+            setTableData(tempTableData);
+            setPagination({
+                current: fetchedData.page_number,
+                pageSize: fetchedData.page_size,
+                total: fetchedData.total_elements,
+            });
 
-                const tempTableData = fetchedData.content.map(item => {
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
-                    return {
-                        seq: item.seq,
-                        customerCom : item.customer_com.name,
-                        customerMgr : item.customer_mgr.name,
-                        estimateMgr : item.estimate_mgr.name,
-                        updDt : item.upd_dt.substring(0, 10),
-                        type : item.estimate_tp === '104002' ? '공사' : '납품'
-                    };
-                });
-                setTableData(tempTableData);
-
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchDataOnMount();
-
-        return () => {
-            //
-        };
-    }, [startDate, endDate, pageIdx, pageSize]);
+    useEffect(() => {
+        fetchData(pagination.current, pagination.pageSize);
+    }, [startDate, endDate, pagination.current, pagination.pageSize]);
 
     const onChange = (dates: [Dayjs | null, Dayjs | null] | null, dateStrings: [string, string]) => {
         if (dates) {
@@ -100,9 +107,6 @@ const Page: React.FC = () => {
             const formattedStartDt = startDt?.format('YYYY-MM-DD') || ''; // startDt가 null이 아닌지 확인하여 null-safe한 접근 방식 사용
             const formattedEndDt = endDt?.format('YYYY-MM-DD') || ''; // endDt가 null이 아닌지 확인하여 null-safe한 접근 방식 사용
 
-            console.log('Start Date:', formattedStartDt);
-            console.log('End Date:', formattedEndDt);
-            // startDt와 endDt를 상태로 변경
             setStartDate(formattedStartDt);
             setEndDate(formattedEndDt);
         }
@@ -116,6 +120,18 @@ const Page: React.FC = () => {
         setTableData(data);
     };
 
+    const clearFilters = () => {
+        setStartDate('2020-01-01');
+        setEndDate('2026-01-17');
+        setSearchSeq('');
+        // Fetch the original data again
+        fetchDataOnMount();
+    };
+
+    const handleTableChange = (pagination) => {
+        fetchData(pagination.current, pagination.pageSize);
+    };
+
     const menu = (
         <Menu>
             <Menu.Item key="1">
@@ -127,31 +143,55 @@ const Page: React.FC = () => {
         </Menu>
     );
 
-
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Header style={{ background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Title level={2} style={{ margin: 0 }}>Item List</Title>
-                <RangePicker onChange={onChange} />
+            <Header style={{ background: '#f5f5f5', padding: '0 24px' }}>
+                <Row justify="space-between" align="middle">
+                    <Col>
+                        <Title level={2} style={{ margin: 0 }}>Item List</Title>
+                    </Col>
+                    <Col>
+                        <RangePicker
+                            onChange={onChange}
+                            defaultValue={[startDateState, endDateState]}
+                            style={{ marginLeft: '16px' }}
+                        />
+                    </Col>
+                </Row>
             </Header>
             <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
                 <div className="site-layout-background" style={{ padding: 24 }}>
-                    <Row gutter={[16, 16]}>
-                        <Col span={6}>
-                            <Input
-                                placeholder="견적서 번호"
-                                value={searchSeq}
-                                onChange={(e) => setSearchSeq(e.target.value)}
-                                onPressEnter={onSearch}
-                            />
+                    <Row gutter={[16, 16]} justify="space-between" align="middle">
+                        <Col span={12}>
+                            <Space>
+                                <Input
+                                    placeholder="견적서 번호"
+                                    value={searchSeq}
+                                    onChange={(e) => setSearchSeq(e.target.value)}
+                                    onPressEnter={onSearch}
+                                />
+                                <Button onClick={onSearch}>검색</Button>
+                                <Button onClick={clearFilters}>초기화</Button>
+                            </Space>
                         </Col>
-                        <Col span={6} offset={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Col span={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <Dropdown overlay={menu} trigger={['click']}>
-                                <Button>신규 생성</Button>
+                                <Button type="primary">신규 생성</Button>
                             </Dropdown>
                         </Col>
                     </Row>
-                    <Table dataSource={tableData} columns={columns} style={{ marginTop: 16 }} />
+                    <Table
+                        dataSource={tableData}
+                        columns={columns}
+                        pagination={{
+                            current: pagination.current,
+                            pageSize: pagination.pageSize,
+                            total: pagination.total,
+                            showSizeChanger: true,
+                        }}
+                        onChange={handleTableChange}
+                        style={{ marginTop: 16 }}
+                    />
                 </div>
             </Content>
         </Layout>
