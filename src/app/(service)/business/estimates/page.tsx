@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useEffect, useState} from 'react';
-import { Layout, DatePicker, Table, Typography, Input, Row, Col } from 'antd';
+import { Layout, DatePicker, Table, Typography, Input, Row, Col, Dropdown, Button, Menu } from 'antd';
 import type { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko';
 import { fetchDataWithToken } from '@/lib/request';
@@ -69,12 +69,13 @@ const Page: React.FC = () => {
                 const fetchedData = await fetchDataWithToken('/estimates', {}, METHOD.POST,  bodyJson); // Adjust endpoint and method accordingly
 
                 const tempTableData = fetchedData.content.map(item => {
+
                     return {
                         seq: item.seq,
                         customerCom : item.customer_com.name,
                         customerMgr : item.customer_mgr.name,
                         estimateMgr : item.estimate_mgr.name,
-                        updDt : item.upd_dt,
+                        updDt : item.upd_dt.substring(0, 10),
                         type : item.estimate_tp === '104002' ? '공사' : '납품'
                     };
                 });
@@ -110,10 +111,22 @@ const Page: React.FC = () => {
     const onSearch = () => {
         let data = tableData;
         if (searchSeq && !isNaN(Number(searchSeq))) {
-            data = data.filter(item => item.e.toString().includes(searchSeq));
+            data = data.filter(item => item.seq.toString().includes(searchSeq));
         }
         setTableData(data);
     };
+
+    const menu = (
+        <Menu>
+            <Menu.Item key="1">
+                공사
+            </Menu.Item>
+            <Menu.Item key="2">
+                납품
+            </Menu.Item>
+        </Menu>
+    );
+
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -131,6 +144,11 @@ const Page: React.FC = () => {
                                 onChange={(e) => setSearchSeq(e.target.value)}
                                 onPressEnter={onSearch}
                             />
+                        </Col>
+                        <Col span={6} offset={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Dropdown overlay={menu} trigger={['click']}>
+                                <Button>신규 생성</Button>
+                            </Dropdown>
                         </Col>
                     </Row>
                     <Table dataSource={tableData} columns={columns} style={{ marginTop: 16 }} />
