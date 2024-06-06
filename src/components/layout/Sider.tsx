@@ -50,7 +50,7 @@ export default function LayoutSider() {
       style={{ backgroundColor: 'white' }}
     >
       <div className="logo"  style={{ height: '64px' }}>
-        <img src="shield_logo.jpg" style={{ height: '64px', width: '200px'}} alt="가설 견적서 로고"/>
+        <img src="/shield_logo.png" style={{ height: '64px', width: '200px'}} alt="가설 견적서 로고"/>
       </div>
       <Menu defaultSelectedKeys={['2']} mode="inline" items={ items } />
     </Sider>
