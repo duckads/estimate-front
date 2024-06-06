@@ -11,35 +11,31 @@ const { Header, Content } = Layout;
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
 
-const sampleData = [
-    { key: '1', estimateSeq: '2', orderCom: '한성', orderMgrNm: '박지성', mgrNm:'안성재', regDt:'2024-05-12', type:'공사'},
-];
-
 const columns = [
     {
         title: '견적 번호',
-        dataIndex: 'estimateSeq',
-        key: 'estimateSeq',
+        dataIndex: 'seq',
+        key: 'seq',
     },
     {
         title: '발주처',
-        dataIndex: 'orderCom',
-        key: 'orderCom',
+        dataIndex: 'customerCom',
+        key: 'customerCom',
     },
     {
         title: '발주처 담당자',
-        dataIndex: 'orderMgrNm',
-        key: 'orderMgrNm',
+        dataIndex: 'customerMgr',
+        key: 'customerMgr',
     },
     {
         title: '내부 담당자',
-        dataIndex: 'mgrNm',
-        key: 'mgrNm',
+        dataIndex: 'estimateMgr',
+        key: 'estimateMgr',
     },
     {
         title: '견적일자',
-        dataIndex: 'regDt',
-        key: 'regDt',
+        dataIndex: 'updDt',
+        key: 'updDt',
     },
     {
         title: '견적구분',
@@ -50,29 +46,40 @@ const columns = [
 
 const Page: React.FC = () => {
 
-    const [filteredData2, setFilteredData2] = useState([]);
+    const [tableData, setTableData] = useState([]);
 
-    // "where": [
-    //     {
-    //         "field": "reg_dt",
-    //         "operation": "between",
-    //         "value": [
-    //             "2020-01-01",
-    //             "2026-01-17"
-    //         ]
-    //     }
-    // ],
-    //     "pageIdx": "0",
-    //     "pageSize": "5"
+    const [startDate, setStartDate] = useState('2020-01-01');
+    const [endDate, setEndDate] = useState('2026-01-17');
+    const [pageIdx, setPageIdx] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
+    const [searchSeq, setSearchSeq] = useState<string>('');
 
     useEffect(() => {
         // Fetch data when component mounts
         const fetchDataOnMount = async () => {
             try {
-                const fetchedData = await fetchDataWithToken('/estimates', {}, METHOD.POST, { where: [{field: 'reg_dt', operation: 'between', value: ['2020-01-01', '2026-01-17']}], pageIdx: 1, pageSize: 10}); // Adjust endpoint and method accordingly
-                setFilteredData2(fetchedData);
-                console.log(fetchedData);
+
+                const bodyJson = {
+                    where: [{ field: 'reg_dt', operation: 'between', value: [startDate, endDate] }],
+                    pageIdx: pageIdx,
+                    pageSize: pageSize
+                };
+
+                const fetchedData = await fetchDataWithToken('/estimates', {}, METHOD.POST,  bodyJson); // Adjust endpoint and method accordingly
+
+                const tempTableData = fetchedData.content.map(item => {
+                    return {
+                        seq: item.seq,
+                        customerCom : item.customer_com.name,
+                        customerMgr : item.customer_mgr.name,
+                        estimateMgr : item.estimate_mgr.name,
+                        updDt : item.upd_dt,
+                        type : item.estimate_tp === '104002' ? '공사' : '납품'
+                    };
+                });
+                setTableData(tempTableData);
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -80,45 +87,32 @@ const Page: React.FC = () => {
 
         fetchDataOnMount();
 
-        // Cleanup function (optional)
         return () => {
-            // Cleanup logic if needed
+            //
         };
-    }, []);
-
-
-
-
-
-
-
-
-
-
-
-    const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
-    const [searchName, setSearchName] = useState<string>('');
-    const [searchAge, setSearchAge] = useState<string>('');
-    const [searchAddress, setSearchAddress] = useState<string>('');
-    const [filteredData, setFilteredData] = useState(sampleData);
+    }, [startDate, endDate, pageIdx, pageSize]);
 
     const onChange = (dates: [Dayjs | null, Dayjs | null] | null, dateStrings: [string, string]) => {
-        setDateRange(dates);
-        // Here you can add logic to filter the table data based on the selected date range
+        if (dates) {
+            const [startDt, endDt] = dates;
+            // startDt와 endDt를 문자열로 변환
+            const formattedStartDt = startDt?.format('YYYY-MM-DD') || ''; // startDt가 null이 아닌지 확인하여 null-safe한 접근 방식 사용
+            const formattedEndDt = endDt?.format('YYYY-MM-DD') || ''; // endDt가 null이 아닌지 확인하여 null-safe한 접근 방식 사용
+
+            console.log('Start Date:', formattedStartDt);
+            console.log('End Date:', formattedEndDt);
+            // startDt와 endDt를 상태로 변경
+            setStartDate(formattedStartDt);
+            setEndDate(formattedEndDt);
+        }
     };
 
     const onSearch = () => {
-        let data = sampleData;
-        if (searchName) {
-            data = data.filter(item => item.estimateSeq.toLowerCase().includes(searchName.toLowerCase()));
+        let data = tableData;
+        if (searchSeq && !isNaN(Number(searchSeq))) {
+            data = data.filter(item => item.e.toString().includes(searchSeq));
         }
-        if (searchAge) {
-            data = data.filter(item => item.orderMgrNm.toString().includes(searchAge));
-        }
-        if (searchAddress) {
-            data = data.filter(item => item.orderMgrNm.toLowerCase().includes(searchAddress.toLowerCase()));
-        }
-        setFilteredData(data);
+        setTableData(data);
     };
 
     return (
@@ -132,36 +126,14 @@ const Page: React.FC = () => {
                     <Row gutter={[16, 16]}>
                         <Col span={6}>
                             <Input
-                                placeholder="Search Name"
-                                value={searchName}
-                                onChange={(e) => setSearchName(e.target.value)}
+                                placeholder="견적서 번호"
+                                value={searchSeq}
+                                onChange={(e) => setSearchSeq(e.target.value)}
                                 onPressEnter={onSearch}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input
-                                placeholder="Search Age"
-                                value={searchAge}
-                                onChange={(e) => setSearchAge(e.target.value)}
-                                onPressEnter={onSearch}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input
-                                placeholder="Search Address"
-                                value={searchAddress}
-                                onChange={(e) => setSearchAddress(e.target.value)}
-                                onPressEnter={onSearch}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Input.Search
-                                placeholder="Search"
-                                onSearch={onSearch}
                             />
                         </Col>
                     </Row>
-                    <Table dataSource={filteredData} columns={columns} style={{ marginTop: 16 }} />
+                    <Table dataSource={tableData} columns={columns} style={{ marginTop: 16 }} />
                 </div>
             </Content>
         </Layout>
