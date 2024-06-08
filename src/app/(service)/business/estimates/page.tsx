@@ -145,52 +145,52 @@ const Page: React.FC = () => {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Header style={{ background: '#f5f5f5', padding: '0 24px' }}>
-                <Row justify="space-between" align="middle">
-                    <Col>
-                        <Title level={2} style={{ margin: 0 }}>Item List</Title>
-                    </Col>
-                    <Col>
+            <Header style={{ height: '96px', padding: '24px 0 0 27px', background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="page-title" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '30px' }}>
+                    <div className="title-text" style={{ display: 'flex', alignItems: 'center' }}>
+                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" className="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{ width: '24px', height: '24px', marginRight: '8px' }}>
+                            <path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path>
+                        </svg>
+                        견적서 관리
+                    </div>
+                    <div className="title-calendar" style={{ textAlign: 'right', paddingRight: '20px' }}>
                         <RangePicker
                             onChange={onChange}
-                            defaultValue={[startDateState, endDateState]}
-                            style={{ marginLeft: '16px' }}
+                            defaultValue={[dayjs(startDateState), dayjs(endDateState)]}
+                            style={{ width: '200px', marginLeft: '5px' }}
                         />
-                    </Col>
-                </Row>
+                    </div>
+                </div>
             </Header>
             <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-                <div className="site-layout-background" style={{ padding: 24 }}>
-                    <Row gutter={[16, 16]} justify="space-between" align="middle">
-                        <Col span={12}>
-                            <Space>
-                                <Input
-                                    placeholder="견적서 번호"
-                                    value={searchSeq}
-                                    onChange={(e) => setSearchSeq(e.target.value)}
-                                    onPressEnter={onSearch}
-                                />
-                                <Button onClick={onSearch}>검색</Button>
-                                <Button onClick={clearFilters}>초기화</Button>
-                            </Space>
-                        </Col>
-                        <Col span={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Dropdown overlay={menu} trigger={['click']}>
-                                <Button type="primary">신규 생성</Button>
-                            </Dropdown>
-                        </Col>
-                    </Row>
+                <div className="site-layout-background" style={{ padding: 10 }}>
                     <Table
                         dataSource={tableData}
                         columns={columns}
-                        pagination={{
+                        title={() => (
+                            <div>
+                                <Row style={{ rowGap: '0px' }}>
+                                    <Col span={12} style={{ textAlign: 'left' }}>
+                                        <Dropdown overlay={menu} trigger={['click']}>
+                                            <Button type="primary"  style={{ borderRadius: 0 }}>견적서 등록</Button>
+                                        </Dropdown>
+                                        <Button style={{ marginLeft: '5px', borderRadius: 0 }}>삭제</Button>
+                                    </Col>
+                                    <Col span={12} style={{ textAlign: 'right' }}>
+                                        <Button style={{ display: 'inline-block', marginLeft: '5px', borderRadius: 0 }}>다운로드</Button>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )}
+
+                        pagination={tableData.length > 0 ? {
                             current: pagination.current,
                             pageSize: pagination.pageSize,
                             total: pagination.total,
                             showSizeChanger: true,
-                        }}
+                        } : false}
+                        locale={{ emptyText: '데이터가 없습니다' }}
                         onChange={handleTableChange}
-                        style={{ marginTop: 16 }}
                     />
                 </div>
             </Content>
