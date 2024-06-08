@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Layout, Menu, Dropdown, Avatar, Typography } from 'antd';
+import { Layout, Menu, Dropdown, Avatar, Typography, Breadcrumb } from 'antd';
 import { UserOutlined, DownOutlined } from '@ant-design/icons';
 
 const { Header } = Layout;
@@ -31,23 +31,20 @@ export default function LayoutHeader() {
     };
 
     return (
-        <Header
-            style={{
-                padding: '0 24px',
-                background: 'blue',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-            }}
-        >
-            <Title level={3} style={{ color: 'white', margin: 0 }}>
-                {title}
-            </Title>
+        <Header style={{ height: '56px', padding: '0 24px', background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #d6d6d6' }}>
+            <div className="ant-breadcrumb" style={{ marginTop: '20px' }}>
+                <Breadcrumb>
+                    <Breadcrumb.Item>견적서 시스템</Breadcrumb.Item>
+                    <Breadcrumb.Item><a href="">영업 관리</a></Breadcrumb.Item>
+                    <Breadcrumb.Item><a href="">견적서 조회</a></Breadcrumb.Item>
+                </Breadcrumb>
+            </div>
             <Dropdown overlay={userMenu(handleMenuClick)} trigger={['click']}>
                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
                     <Avatar icon={<UserOutlined />} /> <DownOutlined />
                 </a>
             </Dropdown>
         </Header>
+
     );
 }

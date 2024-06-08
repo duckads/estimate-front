@@ -19,7 +19,7 @@ export default async function ServiceLayout({
         <LayoutSider />
         <Layout>
           <LayoutHeader></LayoutHeader>
-          <Content style={{ margin: '0 16px' }}>
+          <Content style={{ margin: '0' }}>
             { children }
           </Content>
           <LayoutFooter />
