@@ -2,14 +2,14 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 import { API_URL, METHOD } from '@/lib/apis';
-import { User } from '@/lib/definitions';
+import { CustomSession, CustomToken, User } from '@/lib/definitions';
 import { fetchDataWithHeader } from '@/lib/request';
 import { DEFAULT_REDIRECT, ROOT } from '@/lib/routes';
 import { authConfig } from './auth.config';
 
 /**
  * 로그인 요청을 보내고 accessToken의 정보를 반환하는 함수
- * 
+ *
  * @param { any } credentials - 로그인 데이터 json 형식
  * @returns { Promise<any> } - 요청이 성공하면 JSON 데이터가 포함된 Promise를 반환
  */
@@ -44,7 +44,7 @@ export const {
         //   success: true,
         //   user: loginRes
         // };
-        let loginRes = {
+        let loginRes: any = {
           success: true,
           user: {
             name: '홍길동',
@@ -74,17 +74,19 @@ export const {
       return baseUrl;
     },
     jwt: async ({ token, user }) => {
+      const customToken = token as CustomToken;
       if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.accessToken = user.accessToken;
+        customToken.id = user.id;
+        customToken.name = user?.name || '';
+        customToken.email = user?.email || '';
+        customToken.accessToken = user.accessToken;
       }
-      return token;
+      return customToken;
     },
     session: async ({ session, token }) => {
-      session.accessToken = token.accessToken;
-      return session;
+      const customSession = session as CustomSession;
+      customSession.accessToken = (token as CustomToken).accessToken;
+      return customSession;
     },
   },
   secret: process.env.NEXTAUTH_SECRET

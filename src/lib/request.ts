@@ -4,6 +4,15 @@ import { METHOD } from './apis';
 const BASE_URL = 'http://askabriel.iptime.org:8080';
 
 /**
+ * 현재 런타임이 node인지 browser인지 확인하는 함수
+ *
+ * @returns { boolean } 현재 런타임이 browser이면 true, 아니면 false
+ */
+function isServer() {
+  return typeof window === 'undefined';
+}
+
+/**
  * URL에서 데이터를 가져와서 JSON 형식으로 반환하는 함수
  * 
  * @param { string | URL } url - 요청 URL

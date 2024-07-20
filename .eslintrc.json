@@ -1,20 +1,26 @@
 {
-  "plugins": ["react"],
-  "rules": {
-    "semi": [2, "always"],
+  "extends": "next",
+	"rules": {
+		"semi": [2, "always"],
 		"react/jsx-uses-react": "error",
 		"react/jsx-uses-vars": "error",
-    "react/jsx-curly-spacing": [2, {"when": "always", "children": false}],
+		"react/jsx-curly-spacing": ["warn", {"when": "always", "children": true}],
+		"template-curly-spacing": ["warn", "always"],
 		"no-unused-vars": "warn",
-		"quotes": "off",
-		"jsx-quotes": "off",
+		"quotes": ["warn", "single", {"avoidEscape": true, "allowTemplateLiterals": true}],
+		"jsx-quotes": ["warn", "prefer-double"],
 		"object-curly-spacing": ["warn", "always"],
 		"comma-dangle": "off",
-		"no-console": ["warn", { "allow": ["error", "warn", "info"] }],
+		"comma-spacing": ["error", {"before": false, "after": true}],
+		"no-console": ["warn", {"allow": ["error", "warn", "info"]}],
+		"brace-style": ["error", "1tbs", {"allowSingleLine": true}],
 		"space-before-blocks": "error",
 		"space-before-function-paren": "off",
-		"indent": "off"
-  },
+		"indent": "off",
+		"no-trailing-spaces": "error",
+		"no-extra-semi": "error",
+		"func-call-spacing": ["error", "never"]
+	},
 	"parserOptions": {
 		"ecmaVersion": "latest",
 		"sourceType": "module"
